@@ -168,6 +168,11 @@ type ClusterConfiguration struct {
 	// that we will deploy as host containers in the CPIs
 	// +optional
 	BottlerocketHostContainers []BottlerocketHostContainer `json:"bottlerocketCustomHostContainers,omitempty"`
+
+	// BottlerocketCustomBootstrapContainers adds additional bootstrap containers for Bottlerocket.
+	// This is only for bottlerocket.
+	// +optional
+	BottlerocketCustomBootstrapContainers []BottlerocketBootstrapContainer `json:"bottlerocketCustomBootstrapContainers,omitempty"`
 }
 
 // Pause defines the pause image repo and tag that should be run on the bootstrapped nodes.
@@ -254,7 +259,7 @@ type ImageMeta struct {
 	// +optional
 	ImageTag string `json:"imageTag,omitempty"`
 
-	//TODO: evaluate if we need also a ImageName based on user feedbacks
+	// TODO: evaluate if we need also a ImageName based on user feedbacks
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
@@ -285,7 +290,6 @@ type APIEndpoint struct {
 
 // NodeRegistrationOptions holds fields that relate to registering a new control-plane or node to the cluster, either via "kubeadm init" or "kubeadm join".
 type NodeRegistrationOptions struct {
-
 	// Name is the `.Metadata.Name` field of the Node API object that will be created in this `kubeadm init` or `kubeadm join` operation.
 	// This field is also used in the CommonName field of the kubelet's client certificate to the API server.
 	// Defaults to the hostname of the node if not provided.
@@ -394,7 +398,6 @@ type BootstrapToken struct {
 
 // Etcd contains elements describing Etcd configuration.
 type Etcd struct {
-
 	// Local provides configuration knobs for configuring the local etcd instance
 	// Local and External are mutually exclusive
 	// +optional
@@ -517,6 +520,11 @@ type JoinConfiguration struct {
 	// that we will deploy as host containers in the CPIs
 	// +optional
 	BottlerocketCustomHostContainers []BottlerocketHostContainer `json:"bottlerocketCustomHostContainers,omitempty"`
+
+	// BottlerocketCustomBootstrapContainers adds additional bootstrap containers for Bottlerocket.
+	// This is only for bottlerocket.
+	// +optional
+	BottlerocketCustomBootstrapContainers []BottlerocketBootstrapContainer `json:"bottlerocketCustomBootstrapContainers,omitempty"`
 }
 
 // BottlerocketHostContainer describes a host image for Bottlerocket
@@ -530,6 +538,29 @@ type BottlerocketHostContainer struct {
 	// ImageMeta is the actual location of the container image
 	ImageMeta `json:"source"`
 	// UserData is the userdata that will be attached to the image.
+	// +optional
+	UserData string `json:"userData,omitempty"`
+}
+
+// BottlerocketBootstrapContainer holds the bootstrap container setting for Bottlerocket
+type BottlerocketBootstrapContainer struct {
+	// Name is the bootstrap container name that will be given to the container in BR's `apiserver`.
+	Name string `json:"name"`
+
+	// ImageMeta is the actual image used for Bottlerocket bootstrap.
+	ImageMeta `json:",inline"`
+
+	// Essential decides whether or not the container should fail the boot process.
+	// Bootstrap containers configured with essential = true will stop the boot process if they exit code is a non-zero value.
+	// Default is false.
+	// +optional
+	Essential bool `json:"essential"`
+
+	// Mode represents the bootstrap container mode.
+	// +kubebuilder:validation:Enum=always;off;once
+	Mode string `json:"mode"`
+
+	// UserData is the base64-encoded userdata.
 	// +optional
 	UserData string `json:"userData,omitempty"`
 }
