@@ -81,6 +81,46 @@ KEY=VAR
 [settings.kubernetes.node-taints]
 KEY=VAR`
 
+const userDataRegistryCredentials = `
+[settings.host-containers.admin]
+enabled = true
+superpowered = true
+source = "REPO:TAG"
+user-data = "B64USERDATA"
+[settings.host-containers.kubeadm-bootstrap]
+enabled = true
+superpowered = true
+source = "REPO:TAG"
+user-data = "B64USERDATA"
+
+[settings.kubernetes]
+cluster-domain = "cluster.local"
+standalone-mode = true
+authentication-mode = "tls"
+server-tls-bootstrap = false
+pod-infra-container-image = "PAUSE"
+provider-id = "PROVIDERID"
+
+[settings.bootstrap-containers.BOOTSTRAP]
+essential = false
+mode = "MODE"
+user-data = "B64USERDATA"
+[settings.network]
+https-proxy = "PROXY"
+no-proxy = []
+[settings.container-registry.mirrors]
+"public.ecr.aws" = ["https://REGISTRYENDPOINT"]
+[settings.pki.registry-mirror-ca]
+data = "REGISTRYCA"
+trusted=true
+[settings.container-registry.credentials]
+username = "username"
+password = "password"
+[settings.kubernetes.node-labels]
+KEY=VAR
+[settings.kubernetes.node-taints]
+KEY=VAR`
+
 func TestGenerateUserData(t *testing.T) {
 	g := NewWithT(t)
 
@@ -165,6 +205,48 @@ func TestGenerateUserData(t *testing.T) {
 				},
 			},
 			output: userDataNoAdminImage,
+		},
+		{
+			name: "registry credential settings",
+			input: &BottlerocketSettingsInput{
+				PauseContainerSource:   "PAUSE",
+				HTTPSProxyEndpoint:     "PROXY",
+				RegistryMirrorEndpoint: "REGISTRYENDPOINT",
+				RegistryMirrorUsername: "username",
+				RegistryMirrorPassword: "password",
+				RegistryMirrorCACert:   "REGISTRYCA",
+				NodeLabels:             "KEY=VAR",
+				Taints:                 "KEY=VAR",
+				ProviderId:             "PROVIDERID",
+				HostContainers: []bootstrapv1.BottlerocketHostContainer{
+					{
+						Name:         "admin",
+						Superpowered: true,
+						ImageMeta: bootstrapv1.ImageMeta{
+							ImageRepository: "REPO",
+							ImageTag:        "TAG",
+						},
+						UserData: "B64USERDATA",
+					},
+					{
+						Name:         "kubeadm-bootstrap",
+						Superpowered: true,
+						ImageMeta: bootstrapv1.ImageMeta{
+							ImageRepository: "REPO",
+							ImageTag:        "TAG",
+						},
+						UserData: "B64USERDATA",
+					},
+				},
+				BootstrapContainers: []bootstrapv1.BottlerocketBootstrapContainer{
+					{
+						Name:     "BOOTSTRAP",
+						Mode:     "MODE",
+						UserData: "B64USERDATA",
+					},
+				},
+			},
+			output: userDataRegistryCredentials,
 		},
 	}
 	for _, testcase := range testcases {
