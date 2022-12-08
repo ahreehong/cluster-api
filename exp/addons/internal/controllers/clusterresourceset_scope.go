@@ -142,6 +142,8 @@ func (r *reconcileStrategyScope) apply(ctx context.Context, c client.Client, obj
 	}
 
 	patch := client.MergeFrom(currentObj.DeepCopy())
+	// metadata.ResourceVersion needs to be set to avoid webhook errors in applying
+	obj.SetResourceVersion(currentObj.GetResourceVersion())
 	if err = c.Patch(ctx, obj, patch); err != nil {
 		return errors.Wrapf(
 			err,
