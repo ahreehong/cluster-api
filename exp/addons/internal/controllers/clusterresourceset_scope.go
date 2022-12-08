@@ -141,7 +141,7 @@ func (r *reconcileStrategyScope) apply(ctx context.Context, c client.Client, obj
 		)
 	}
 
-	patch := client.MergeFrom(obj.DeepCopy())
+	patch := client.MergeFrom(currentObj.DeepCopy())
 	if err = c.Patch(ctx, obj, patch); err != nil {
 		return errors.Wrapf(
 			err,
