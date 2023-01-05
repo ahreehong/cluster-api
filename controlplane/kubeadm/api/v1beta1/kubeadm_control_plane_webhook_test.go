@@ -627,11 +627,29 @@ func TestKubeadmControlPlaneValidateUpdate(t *testing.T) {
 	validUpdateClusterConfBRBootstrapImage := before.DeepCopy()
 	validUpdateClusterConfBRBootstrapImage.Spec.KubeadmConfigSpec.ClusterConfiguration.BottlerocketBootstrap = bootstrapv1.BottlerocketBootstrap{ImageMeta: bootstrapv1.ImageMeta{ImageTag: "v1.1.0+new"}}
 
+	validUpdateClusterConfBRAdminImage := before.DeepCopy()
+	validUpdateClusterConfBRAdminImage.Spec.KubeadmConfigSpec.ClusterConfiguration.BottlerocketAdmin = bootstrapv1.BottlerocketAdmin{ImageMeta: bootstrapv1.ImageMeta{ImageTag: "v1.1.0+new"}}
+
+	validUpdateClusterConfBRControlImage := before.DeepCopy()
+	validUpdateClusterConfBRControlImage.Spec.KubeadmConfigSpec.ClusterConfiguration.BottlerocketControl = bootstrapv1.BottlerocketControl{ImageMeta: bootstrapv1.ImageMeta{ImageTag: "v1.1.0+new"}}
+
+	validUpdateClusterConfBRCustomBootstrapContainers := before.DeepCopy()
+	validUpdateClusterConfBRCustomBootstrapContainers.Spec.KubeadmConfigSpec.ClusterConfiguration.BottlerocketCustomBootstrapContainers = []bootstrapv1.BottlerocketBootstrapContainer{{ImageMeta: bootstrapv1.ImageMeta{ImageTag: "v1.1.0+new"}}}
+
 	validUpdateJoinConfPauseImage := before.DeepCopy()
 	validUpdateJoinConfPauseImage.Spec.KubeadmConfigSpec.JoinConfiguration.Pause = bootstrapv1.Pause{ImageMeta: bootstrapv1.ImageMeta{ImageTag: "v1.1.0+new"}}
 
 	validUpdateJoinConfBRBootstrapImage := before.DeepCopy()
 	validUpdateJoinConfBRBootstrapImage.Spec.KubeadmConfigSpec.JoinConfiguration.BottlerocketBootstrap = bootstrapv1.BottlerocketBootstrap{ImageMeta: bootstrapv1.ImageMeta{ImageTag: "v1.1.0+new"}}
+
+	validUpdateJoinConfBRAdminImage := before.DeepCopy()
+	validUpdateJoinConfBRAdminImage.Spec.KubeadmConfigSpec.JoinConfiguration.BottlerocketAdmin = bootstrapv1.BottlerocketAdmin{ImageMeta: bootstrapv1.ImageMeta{ImageTag: "v1.1.0+new"}}
+
+	validUpdateJoinConfBRControlImage := before.DeepCopy()
+	validUpdateJoinConfBRControlImage.Spec.KubeadmConfigSpec.JoinConfiguration.BottlerocketControl = bootstrapv1.BottlerocketControl{ImageMeta: bootstrapv1.ImageMeta{ImageTag: "v1.1.0+new"}}
+
+	validUpdateJoinConfBRCustomBootstrapContainers := before.DeepCopy()
+	validUpdateJoinConfBRCustomBootstrapContainers.Spec.KubeadmConfigSpec.JoinConfiguration.BottlerocketCustomBootstrapContainers = []bootstrapv1.BottlerocketBootstrapContainer{{ImageMeta: bootstrapv1.ImageMeta{ImageTag: "v1.1.0+new"}}}
 
 	tests := []struct {
 		name                  string
@@ -984,6 +1002,24 @@ func TestKubeadmControlPlaneValidateUpdate(t *testing.T) {
 			kcp:       validUpdateClusterConfBRBootstrapImage,
 		},
 		{
+			name:      "should allow changes to cluster configuration bottlerocket admin image",
+			expectErr: false,
+			before:    before,
+			kcp:       validUpdateClusterConfBRAdminImage,
+		},
+		{
+			name:      "should allow changes to cluster configuration bottlerocket control image",
+			expectErr: false,
+			before:    before,
+			kcp:       validUpdateClusterConfBRControlImage,
+		},
+		{
+			name:      "should allow changes to cluster configuration bottlerocket custom bootstrap containers",
+			expectErr: false,
+			before:    before,
+			kcp:       validUpdateClusterConfBRCustomBootstrapContainers,
+		},
+		{
 			name:      "should allow changes to join configuration pause image",
 			expectErr: false,
 			before:    before,
@@ -994,6 +1030,24 @@ func TestKubeadmControlPlaneValidateUpdate(t *testing.T) {
 			expectErr: false,
 			before:    before,
 			kcp:       validUpdateJoinConfBRBootstrapImage,
+		},
+		{
+			name:      "should allow changes to join configuration bottlerocket admin image",
+			expectErr: false,
+			before:    before,
+			kcp:       validUpdateJoinConfBRAdminImage,
+		},
+		{
+			name:      "should allow changes to join configuration bottlerocket control image",
+			expectErr: false,
+			before:    before,
+			kcp:       validUpdateJoinConfBRControlImage,
+		},
+		{
+			name:      "should allow changes to join configuration bottlerocket custom bootstrap containers",
+			expectErr: false,
+			before:    before,
+			kcp:       validUpdateJoinConfBRCustomBootstrapContainers,
 		},
 	}
 
