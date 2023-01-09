@@ -19,7 +19,6 @@ package machine
 import (
 	"context"
 	"fmt"
-	"sigs.k8s.io/controller-runtime/pkg/client"
 	"time"
 
 	"github.com/pkg/errors"
@@ -30,6 +29,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/utils/pointer"
 	ctrl "sigs.k8s.io/controller-runtime"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 
@@ -43,9 +43,7 @@ import (
 	"sigs.k8s.io/cluster-api/util/patch"
 )
 
-var (
-	externalReadyWait = 30 * time.Second
-)
+var externalReadyWait = 30 * time.Second
 
 func (r *Reconciler) reconcilePhase(_ context.Context, m *clusterv1.Machine) {
 	originalPhase := m.Status.Phase //nolint:ifshort // Cannot be inlined because m.Status.Phase might be changed before it is used in the if.
@@ -71,8 +69,7 @@ func (r *Reconciler) reconcilePhase(_ context.Context, m *clusterv1.Machine) {
 	}
 
 	if _, ok := m.Labels[clusterv1.MachineEtcdClusterLabelName]; ok {
-		// Status.NodeRef does not get set for etcd machines since they don't correspond to k8s node objects
-		if m.Status.InfrastructureReady {
+		if _, ok := m.Labels[clusterv1.MachineEtcdReadyLabelName]; ok && m.Status.InfrastructureReady {
 			m.Status.SetTypedPhase(clusterv1.MachinePhaseRunning)
 		}
 	}
@@ -370,7 +367,7 @@ func (r *Reconciler) reconcileInfrastructure(ctx context.Context, cluster *clust
 							},
 						},
 						Data: map[string][]byte{
-							"address": []byte(machineIP),
+							"address":    []byte(machineIP),
 							"clientUrls": []byte(fmt.Sprintf("https://%v:2379", machineIP)),
 						},
 						Type: clusterv1.ClusterSecretType,
