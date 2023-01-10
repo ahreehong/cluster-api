@@ -41,6 +41,8 @@ type BottlerocketSettingsInput struct {
 	NoProxyEndpoints       []string
 	RegistryMirrorEndpoint string
 	RegistryMirrorCACert   string
+	RegistryMirrorUsername string
+	RegistryMirrorPassword string
 	NodeLabels             string
 	Taints                 string
 	ProviderId             string
@@ -124,6 +126,9 @@ func generateNodeUserData(kind string, tpl string, data interface{}) ([]byte, er
 	if _, err := tm.Parse(registryMirrorCACertTemplate); err != nil {
 		return nil, errors.Wrapf(err, "failed to parse registry mirror ca cert %s template", kind)
 	}
+	if _, err := tm.Parse(registryMirrorCredentialsTemplate); err != nil {
+		return nil, errors.Wrapf(err, "failed to parse registry mirror credentials %s template", kind)
+	}
 	if _, err := tm.Parse(nodeLabelsTemplate); err != nil {
 		return nil, errors.Wrapf(err, "failed to parse node labels %s template", kind)
 	}
@@ -188,6 +193,8 @@ func getBottlerocketNodeUserData(bootstrapContainerUserData []byte, users []boot
 		PauseContainerSource:   fmt.Sprintf("%s:%s", config.Pause.ImageRepository, config.Pause.ImageTag),
 		HTTPSProxyEndpoint:     config.ProxyConfiguration.HTTPSProxy,
 		RegistryMirrorEndpoint: config.RegistryMirrorConfiguration.Endpoint,
+		RegistryMirrorUsername: config.RegistryMirrorConfiguration.Username,
+		RegistryMirrorPassword: config.RegistryMirrorConfiguration.Password,
 		NodeLabels:             parseNodeLabels(config.KubeletExtraArgs["node-labels"]), // empty string if it does not exist
 		Taints:                 parseTaints(config.Taints),                              // empty string if it does not exist
 		ProviderId:             config.KubeletExtraArgs["provider-id"],
