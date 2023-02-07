@@ -34,6 +34,7 @@ type BottlerocketConfig struct {
 	BottlerocketCustomHostContainers      []bootstrapv1.BottlerocketHostContainer
 	BottlerocketCustomBootstrapContainers []bootstrapv1.BottlerocketBootstrapContainer
 	NTPServers                            []string
+	Hostname                              string
 	RegistryMirrorCredentials
 }
 
@@ -49,6 +50,7 @@ type BottlerocketSettingsInput struct {
 	NTPServers             []string
 	Taints                 string
 	ProviderId             string
+	Hostname               string
 	HostContainers         []bootstrapv1.BottlerocketHostContainer
 	BootstrapContainers    []bootstrapv1.BottlerocketBootstrapContainer
 }
@@ -125,6 +127,9 @@ func generateNodeUserData(kind string, tpl string, data interface{}) ([]byte, er
 	if _, err := tm.Parse(kubernetesInitTemplate); err != nil {
 		return nil, errors.Wrapf(err, "failed to parse kubernetes %s template", kind)
 	}
+	// if _, err := tm.Parse(networkTemplate); err != nil {
+	// 	return nil, errors.Wrapf(err, "failed to parse kubernetes %s template", kind)
+	// }
 	if _, err := tm.Parse(networkInitTemplate); err != nil {
 		return nil, errors.Wrapf(err, "failed to parse networks %s template", kind)
 	}
@@ -204,11 +209,10 @@ func getBottlerocketNodeUserData(bootstrapContainerUserData []byte, users []boot
 		PauseContainerSource:   fmt.Sprintf("%s:%s", config.Pause.ImageRepository, config.Pause.ImageTag),
 		HTTPSProxyEndpoint:     config.ProxyConfiguration.HTTPSProxy,
 		RegistryMirrorEndpoint: config.RegistryMirrorConfiguration.Endpoint,
-		RegistryMirrorUsername: config.RegistryMirrorConfiguration.Username,
-		RegistryMirrorPassword: config.RegistryMirrorConfiguration.Password,
 		NodeLabels:             parseNodeLabels(config.KubeletExtraArgs["node-labels"]), // empty string if it does not exist
 		Taints:                 parseTaints(config.Taints),                              // empty string if it does not exist
 		ProviderId:             config.KubeletExtraArgs["provider-id"],
+		Hostname:               config.Hostname,
 		HostContainers:         hostContainers,
 		BootstrapContainers:    config.BottlerocketCustomBootstrapContainers,
 	}
