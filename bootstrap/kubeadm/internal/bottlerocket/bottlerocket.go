@@ -35,6 +35,8 @@ type BottlerocketConfig struct {
 	BottlerocketCustomBootstrapContainers []bootstrapv1.BottlerocketBootstrapContainer
 	NTPServers                            []string
 	Hostname                              string
+	// KernelSettings                        []bootstrapv1.KernelSetting
+	KernelSettings map[string]string
 	RegistryMirrorCredentials
 }
 
@@ -53,6 +55,8 @@ type BottlerocketSettingsInput struct {
 	Hostname               string
 	HostContainers         []bootstrapv1.BottlerocketHostContainer
 	BootstrapContainers    []bootstrapv1.BottlerocketBootstrapContainer
+	KernelSettings         string
+	// KernelSettings         []bootstrapv1.KernelSetting
 }
 
 type HostPath struct {
@@ -148,6 +152,12 @@ func generateNodeUserData(kind string, tpl string, data interface{}) ([]byte, er
 	if _, err := tm.Parse(ntpTemplate); err != nil {
 		return nil, errors.Wrapf(err, "failed to parse NTP %s template", kind)
 	}
+	if _, err := tm.Parse(kernelSettingsTemplate); err != nil {
+		return nil, errors.Wrapf(err, "failed to parse kernel settings %s template", kind)
+	}
+	// if _, err := tm.Parse(kernelTemplate); err != nil {
+	// 	return nil, errors.Wrapf(err, "failed to parse kernel %s template", kind)
+	// }
 	t, err := tm.Parse(tpl)
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to parse %s template", kind)
@@ -212,6 +222,7 @@ func getBottlerocketNodeUserData(bootstrapContainerUserData []byte, users []boot
 		Hostname:               config.Hostname,
 		HostContainers:         hostContainers,
 		BootstrapContainers:    config.BottlerocketCustomBootstrapContainers,
+		KernelSettings:         parseKernelSettings(config.KernelSettings),
 	}
 
 	if len(config.ProxyConfiguration.NoProxy) > 0 {
@@ -282,6 +293,17 @@ func parseNodeLabels(nodeLabels string) string {
 		}
 	}
 	return nodeLabelsToml
+}
+
+func parseKernelSettings(kernelSettings map[string]string) string {
+	if kernelSettings == nil {
+		return ""
+	}
+	kernelSettingsToml := ""
+	for key, value := range kernelSettings {
+		kernelSettingsToml += fmt.Sprintf("\"%v\" = \"%v\"\n", key, value)
+	}
+	return kernelSettingsToml
 }
 
 // Parses through all the users and return list of all user's authorized ssh keys

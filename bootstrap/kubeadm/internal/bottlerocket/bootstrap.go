@@ -106,6 +106,23 @@ time-servers = [{{stringsJoin .NTPServers ", " }}]
 {{- end -}}
 `
 
+	kernelSettingsTemplate = `{{ define "kernelSettingsTemplate" -}}
+[settings.kernel.sysctl]
+{{.KernelSettings}}
+{{- end -}}
+`
+	// 	kernelSettingTemplate = `{{ define "kernelSettingTemplate" -}}
+	// "{{.Key}}" = "{{.Value}}"
+	// {{- end -}}
+	// `
+	// 	kernelTemplate = `{{ define "kernelSettingsTemplate" -}}
+	// [settings.kernel.sysctl]
+	// {{- range $kernelSetting := .KernelSettings }}
+	// {{template "kernelSettingTemplate" $kernelSetting }}
+	// {{- end -}}
+	// {{- end -}}
+	// `
+
 	bottlerocketNodeInitSettingsTemplate = `{{template "hostContainerSlice" .}}
 
 {{template "kubernetesInitSettings" .}}
@@ -139,6 +156,10 @@ time-servers = [{{stringsJoin .NTPServers ", " }}]
 
 {{- if .NTPServers}}
 {{template "ntpSettings" .}}
+{{- end -}}
+
+{{- if (ne .KernelSettings "")}}
+{{template "kernelSettingsTemplate" .}}
 {{- end -}}
 `
 )

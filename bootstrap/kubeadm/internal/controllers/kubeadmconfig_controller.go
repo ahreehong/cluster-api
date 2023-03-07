@@ -478,6 +478,7 @@ func (r *KubeadmConfigReconciler) handleClusterNotInitialized(ctx context.Contex
 			BottlerocketCustomHostContainers:      scope.Config.Spec.ClusterConfiguration.BottlerocketHostContainers,
 			BottlerocketCustomBootstrapContainers: scope.Config.Spec.ClusterConfiguration.BottlerocketCustomBootstrapContainers,
 			Hostname:                              machine.Name,
+			KernelSettings:                        scope.Config.Spec.ClusterConfiguration.KernelSettings,
 		}
 		if scope.Config.Spec.ClusterConfiguration.Proxy.HTTPSProxy != "" {
 			bottlerocketConfig.ProxyConfiguration = scope.Config.Spec.ClusterConfiguration.Proxy
@@ -691,6 +692,7 @@ func (r *KubeadmConfigReconciler) joinWorker(ctx context.Context, scope *Scope) 
 			BottlerocketCustomHostContainers:      scope.Config.Spec.JoinConfiguration.BottlerocketCustomHostContainers,
 			BottlerocketCustomBootstrapContainers: scope.Config.Spec.JoinConfiguration.BottlerocketCustomBootstrapContainers,
 			Hostname:                              machine.Name,
+			KernelSettings:                        scope.Config.Spec.JoinConfiguration.KernelSettings,
 		}
 		if scope.Config.Spec.JoinConfiguration.Proxy.HTTPSProxy != "" {
 			bottlerocketConfig.ProxyConfiguration = scope.Config.Spec.JoinConfiguration.Proxy
@@ -836,6 +838,7 @@ func (r *KubeadmConfigReconciler) joinControlplane(ctx context.Context, scope *S
 			BottlerocketCustomHostContainers:      scope.Config.Spec.JoinConfiguration.BottlerocketCustomHostContainers,
 			BottlerocketCustomBootstrapContainers: scope.Config.Spec.JoinConfiguration.BottlerocketCustomBootstrapContainers,
 			Hostname:                              machine.Name,
+			KernelSettings:                        scope.Config.Spec.JoinConfiguration.KernelSettings,
 		}
 		if scope.Config.Spec.JoinConfiguration.Proxy.HTTPSProxy != "" {
 			bottlerocketConfig.ProxyConfiguration = scope.Config.Spec.JoinConfiguration.Proxy

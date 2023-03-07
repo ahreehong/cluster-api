@@ -185,6 +185,9 @@ type ClusterConfiguration struct {
 	// This is only for bottlerocket.
 	// +optional
 	BottlerocketCustomBootstrapContainers []BottlerocketBootstrapContainer `json:"bottlerocketCustomBootstrapContainers,omitempty"`
+
+	//
+	KernelSettings map[string]string `json:"kernelSettings,omitempty"`
 }
 
 // Pause defines the pause image repo and tag that should be run on the bootstrapped nodes.
@@ -560,6 +563,9 @@ type JoinConfiguration struct {
 	// This is only for bottlerocket.
 	// +optional
 	BottlerocketCustomBootstrapContainers []BottlerocketBootstrapContainer `json:"bottlerocketCustomBootstrapContainers,omitempty"`
+
+	// KernelSettings []KernelSetting `json:"kernelSettings,omitempty"`
+	KernelSettings map[string]string `json:"kernelSettings,omitempty"`
 }
 
 // BottlerocketHostContainer describes a host image for Bottlerocket
@@ -599,6 +605,14 @@ type BottlerocketBootstrapContainer struct {
 	// +optional
 	UserData string `json:"userData,omitempty"`
 }
+
+// // FIX ME
+// type KernelSetting struct {
+// 	//
+// 	Key string `json:"key"`
+
+// 	Value string `json:"value"`
+// }
 
 // JoinControlPlane contains elements describing an additional control plane instance to be deployed on the joining node.
 type JoinControlPlane struct {
