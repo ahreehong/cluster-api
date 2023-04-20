@@ -274,7 +274,10 @@ func getBottlerocketNodeUserData(bootstrapContainerUserData []byte, users []boot
 
 	}
 	if config.CertBundle != nil {
-		bottlerocketInput.CertBundles = config.CertBundle
+		for _, cert := range config.CertBundle {
+			cert.Data = base64.StdEncoding.EncodeToString([]byte(cert.Data))
+			bottlerocketInput.CertBundles = append(bottlerocketInput.CertBundles, cert)
+		}
 	}
 
 	return generateNodeUserData("InitBottlerocketNode", bottlerocketNodeInitSettingsTemplate, bottlerocketInput)

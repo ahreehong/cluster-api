@@ -335,10 +335,10 @@ provider-id = "PROVIDERID"
 hostname = "hostname"
 
 [settings.pki.bundle1]
-data = "ABCDEF"
+data = "QUJDREVG"
 trusted = true
 [settings.pki.bundle2]
-data = "123456"
+data = "MTIzNDU2"
 trusted = true`
 )
 
